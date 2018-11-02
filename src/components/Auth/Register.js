@@ -5,14 +5,16 @@ import { Link } from 'react-router-dom';
 class Register extends React.Component {
     state ={}
 
-    handleChange = () => {}
+    handleChange = () => {
+        
+    }
     render(){
         return (
             <Grid textAlign="center" verticalAlign="middle" className="app">
                 <Grid.Column style={{ maxWidth: 450}}>
-                    <Header as="h2" icon color="orange" textAlign="center">
-                        <Icon name="puzzle piece" color="orange">
-                            Register for DevChat
+                    <Header as="h2" icon color="blue" textAlign="center">
+                        <Icon name="universal access" color="blue">
+                            Register for Chat
                         </Icon>
                     </Header>
                     <Form size="large">
@@ -29,7 +31,7 @@ class Register extends React.Component {
                             <Form.Input fluid name="passwordConfirmation" icon="repeat" iconPosition="left" 
                             placeholder="Password Confirmation" onChange={this.handleChange} type="password"/>
 
-                            <Button color="orange" fluid size="large">Submit</Button>
+                            <Button color="blue" fluid size="large">Submit</Button>
                         </Segment>
                     </Form>
 
