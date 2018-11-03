@@ -1,9 +1,8 @@
 import React from 'react';
 import firebase from '../../firebase';
+import md5 from 'md5';
 import { Grid, Form, Segment, Button, Header, Message, Icon }from 'semantic-ui-react';
 import { Link } from 'react-router-dom';
-import { create } from 'handlebars';
-import { throws } from 'assert';
 
 class Register extends React.Component {
     state ={
@@ -12,7 +11,8 @@ class Register extends React.Component {
         password: "",
         passwordConfirmation: "",
         errors: [],
-        loading: false
+        loading: false,
+        userRef: firebase.database().ref('users')
     };
 
     isFormValid = () => {
@@ -26,7 +26,7 @@ class Register extends React.Component {
 
             return false;
 
-        } else if(this.isPasswordValid(this.state)){
+        } else if(!this.isPasswordValid(this.state)){
 
             error = { message: 'Password is invalid'};
             this.setState({ errors: errors.concat(error) });
@@ -61,14 +61,36 @@ class Register extends React.Component {
         });
     };
 
+    saveUser = createdUser =>{
+        return this.state.userRef.child(createdUser.user.uid).set({
+            name: createdUser.user.displayName,
+            avatar: createdUser.user.photoURL
+        });
+    }
+
     handleSubmit = event =>{
         event.preventDefault();
         if(this.isFormValid()){     
             this.setState({errors:[], loading: true})
             firebase.auth()
-            .createUserWithEmailAndPassword(this.state.email, this.state.password).then(createdUser => {
+            .createUserWithEmailAndPassword(this.state.email, this.state.password)
+            .then(createdUser => {
+
                 console.log(createdUser);
-                this.setState({loading: false});
+
+                createdUser.user.updateProfile({
+                    displayName: this.state.username,
+                    photoURL: `http://gravatar.com/avatar/${md5(createdUser.user.email)}?d=identicon`
+                }).then(()=>{
+                    this.saveUser(createdUser).then(()=>{
+                        console.log("user saved");
+                    })
+                    this.setState({loading: false});
+                }).catch(err=>{
+                    console.error(err);
+                    this.setState({errors: this.state.errors.concat(err), loading: false});
+                });
+                
             })
             .catch(err=>{
                 console.error(err);
